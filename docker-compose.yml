@@ -1,0 +1,39 @@
+# docker-compose.yml
+
+# Usage:
+# 1) Build & start the container: docker compose up --build -d
+# 2) Enter it: docker exec -it cursor-agent bash
+# 3) Cursor CLI is installed during build and the entrypoint auto-starts the agent.
+#
+# Notes:
+# - The repo root is mounted at /workspace so the Cursor agent can access files.
+# - The image is built from the Dockerfile in this repo; the Dockerfile runs the
+#   Cursor installer during build by default. Set INSTALL_CURSOR=false if you need
+#   to skip that step and install manually inside the container later.
+
+version: "3.8"
+
+services:
+  cursor-agent:
+    build:
+      context: .
+      # The image installs the Cursor CLI by default. Set INSTALL_CURSOR to "false" if you want to skip it.
+      args:
+        INSTALL_CURSOR: "true"
+    container_name: cursor-agent
+    working_dir: /workspace
+    env_file:
+      - .env
+    volumes:
+      - ./:/workspace:rw
+      - ./sandbox:/workspace/sandbox:rw
+    tty: true
+    stdin_open: true
+    # If the image was built with the Cursor installer, the agent will already be present.
+    # Keep the container alive so you can exec in and inspect logs or run the agent.
+    entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
+    command: ["bash", "-c", "tail -f /dev/null"]
+    # optionally expose ports if needed:
+    # ports:
+    #   - "3000:3000"
+

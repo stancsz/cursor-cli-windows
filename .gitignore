@@ -1,0 +1,30 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+cursor-config.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Node modules (if using Node.js)
+node_modules/
+
+# Python (if using Python)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
