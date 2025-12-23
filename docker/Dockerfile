@@ -30,9 +30,10 @@ RUN if [ "$INSTALL_CURSOR" = "true" ]; then \
 # Add local bin to PATH
 ENV PATH="/root/.local/bin:$PATH"
 
-# Copy entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Copy entrypoint scripts
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY docker/docker-entrypoint-interactive.sh /usr/local/bin/docker-entrypoint-interactive.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint-interactive.sh
 
 # Set working directory
 WORKDIR /workspace

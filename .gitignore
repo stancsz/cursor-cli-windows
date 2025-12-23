@@ -28,3 +28,7 @@ __pycache__/
 venv/
 env/
 
+# Sandbox workspace (keep .gitkeep tracked)
+sandbox/*
+!sandbox/.gitkeep
+

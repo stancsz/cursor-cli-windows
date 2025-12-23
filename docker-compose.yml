@@ -11,12 +11,11 @@
 #   Cursor installer during build by default. Set INSTALL_CURSOR=false if you need
 #   to skip that step and install manually inside the container later.
 
-version: "3.8"
-
 services:
   cursor-agent:
     build:
       context: .
+      dockerfile: docker/Dockerfile
       # The image installs the Cursor CLI by default. Set INSTALL_CURSOR to "false" if you want to skip it.
       args:
         INSTALL_CURSOR: "true"

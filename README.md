@@ -22,13 +22,13 @@ This repository contains a Docker setup for running the Cursor CLI agent in a co
    
    **Windows (PowerShell):**
    ```powershell
-   .\run-docker.ps1
+   .\scripts\run-docker.ps1
    ```
    
    **macOS/Linux:**
    ```bash
-   chmod +x run-docker.sh
-   ./run-docker.sh
+   chmod +x scripts/run-docker.sh
+   ./scripts/run-docker.sh
    ```
    
    **Or manually:**
@@ -41,7 +41,16 @@ This repository contains a Docker setup for running the Cursor CLI agent in a co
    docker exec -it cursor-agent bash
    ```
 
-4. **Check agent logs**:
+4. **Run cursor-agent interactively** (optional):
+   ```powershell
+   # Windows
+   .\scripts\run-agent-interactive.ps1
+   
+   # Or manually
+   docker exec -it cursor-agent cursor-agent
+   ```
+
+5. **Check agent logs** (if running in background):
    ```bash
    docker exec cursor-agent tail -n 20 /workspace/cursor-agent.log
    ```
@@ -91,18 +100,67 @@ curl https://cursor.com/install -fsS | bash
 ```
 .
 ├── docker-compose.yml      # Docker Compose configuration
-├── Dockerfile              # Container image definition
-├── docker-entrypoint.sh    # Container entrypoint script
-├── run-docker.ps1          # Windows helper script
-├── run-docker.sh           # macOS/Linux helper script
+├── docker/                 # Docker-related files
+│   ├── Dockerfile          # Container image definition
+│   ├── docker-entrypoint.sh    # Container entrypoint script
+│   └── docker-entrypoint-interactive.sh
+├── scripts/                # Helper scripts
+│   ├── run-docker.ps1      # Windows helper script
+│   ├── run-docker.sh       # macOS/Linux helper script
+│   ├── run-agent-interactive.ps1
+│   ├── run-agent-interactive.sh
+│   ├── test-hello-world.ps1
+│   ├── clear-sandbox.ps1   # Clear sandbox workspace (Windows)
+│   └── clear-sandbox.sh    # Clear sandbox workspace (macOS/Linux)
+├── docs/                   # Documentation
+│   ├── INTERACTIVE.md
+│   └── TESTING.md
 ├── .env                    # Environment variables (gitignored)
 ├── sandbox/                # Shared directory with Cursor
 └── README.md               # This file
 ```
 
+## Running Interactively
+
+By default, `cursor-agent` runs in the background. To run it interactively:
+
+**Quick method:**
+```powershell
+.\scripts\run-agent-interactive.ps1
+```
+
+**Manual method:**
+```bash
+docker exec -it cursor-agent cursor-agent
+```
+
+See [docs/INTERACTIVE.md](docs/INTERACTIVE.md) for more options and details.
+
+## Managing the Sandbox
+
+The `sandbox/` directory is shared with the Cursor agent container. You can clear it to start fresh:
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\clear-sandbox.ps1
+# Or skip confirmation:
+.\scripts\clear-sandbox.ps1 -Force
+```
+
+**macOS/Linux:**
+```bash
+chmod +x scripts/clear-sandbox.sh
+./scripts/clear-sandbox.sh
+# Or skip confirmation:
+./scripts/clear-sandbox.sh --force
+```
+
+**Note:** The `clear-sandbox` script preserves `README.md` and `.gitkeep` and only deletes other files and directories.
+
 ## Notes
 
-- The container runs `cursor-agent` automatically on startup if the CLI is installed
+- The container runs `cursor-agent` automatically in the background on startup if the CLI is installed
 - Logs are written to `/workspace/cursor-agent.log` inside the container
 - The container stays alive with `tail -f /dev/null` so you can exec into it
 - Set `INSTALL_CURSOR=false` in docker-compose.yml to skip CLI installation during build
+- Use interactive mode for debugging or when you need to see real-time output
