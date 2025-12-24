@@ -1,131 +1,101 @@
 # Cursor CLI Docker Setup
 
-This repository contains a Docker setup for running the Cursor CLI agent in a containerized environment.
+A containerized development environment for running the Cursor CLI agent with Docker. This project provides a complete setup for running Cursor's AI-powered coding assistant in an isolated, reproducible container environment.
+
+## Overview
+
+This repository provides a Docker-based solution for running the Cursor CLI agent, making it easy to:
+- Run Cursor agent in a consistent, isolated environment
+- Share workspace files between host and container
+- Manage agent configuration and authentication
+- Run the agent in background or interactive modes
+
+## Features
+
+- 🐳 **Docker-based**: Fully containerized setup using Docker Compose
+- 🔐 **Secure Configuration**: Environment-based API key management
+- 📁 **Volume Mounting**: Full workspace access with shared sandbox directory
+- 🚀 **Quick Start**: Helper scripts for Windows, macOS, and Linux
+- 📊 **Logging**: Automatic log file generation for background operations
+- 🔄 **Interactive Mode**: Support for both background and interactive agent execution
+
+## Prerequisites
+
+- **Docker Desktop** (Windows/macOS) or **Docker Engine** (Linux)
+- **Docker Compose** (included with Docker Desktop, or install separately)
+- **Cursor API Key** (for authentication)
 
 ## Quick Start
 
-### Prerequisites
+### 1. Clone the Repository
 
-- Docker Desktop (Windows) or Docker Engine (macOS/Linux)
-- Docker Compose
+```bash
+git clone https://github.com/stancsz/cursor-sandbox.git
+cd cursor-sandbox
+```
 
-### Setup Steps
+### 2. Configure Environment
 
-1. **Create environment file** (optional but recommended):
-   ```bash
-   # Copy the example and add your Cursor credentials
-   cp .env.example .env
-   # Edit .env and add your CURSOR_API_KEY
-   ```
+Create a `.env` file from the example:
 
-2. **Build and start the container**:
-   
-   **Windows (PowerShell):**
-   ```powershell
-   .\scripts\run-docker.ps1
-   ```
-   
-   **macOS/Linux:**
-   ```bash
-   chmod +x scripts/run-docker.sh
-   ./scripts/run-docker.sh
-   ```
-   
-   **Or manually:**
-   ```bash
-   docker compose up --build -d
-   ```
+```bash
+cp .env.example .env
+```
 
-3. **Enter the container**:
-   ```bash
-   docker exec -it cursor-agent bash
-   ```
-
-4. **Run cursor-agent interactively** (optional):
-   ```powershell
-   # Windows
-   .\scripts\run-agent-interactive.ps1
-   
-   # Or manually
-   docker exec -it cursor-agent cursor-agent
-   ```
-
-5. **Check agent logs** (if running in background):
-   ```bash
-   docker exec cursor-agent tail -n 20 /workspace/cursor-agent.log
-   ```
-
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file in the repository root with your Cursor credentials:
+Edit `.env` and add your Cursor API key:
 
 ```bash
 CURSOR_API_KEY=your_cursor_api_key_here
 ```
 
-### Volumes
+### 3. Build and Start
 
-- The entire repository root is mounted at `/workspace` in the container
-- The `sandbox/` directory is also explicitly mounted for shared files with Cursor
+**Windows (PowerShell):**
+```powershell
+.\scripts\run-docker.ps1
+```
 
-## Docker Compose Commands
+**macOS/Linux:**
+```bash
+chmod +x scripts/run-docker.sh
+./scripts/run-docker.sh
+```
 
-- **Start container**: `docker compose up -d`
-- **Stop container**: `docker compose down`
-- **View logs**: `docker compose logs -f cursor-agent`
-- **Rebuild**: `docker compose up --build -d`
-- **Enter container**: `docker exec -it cursor-agent bash`
+**Or manually:**
+```bash
+docker compose up --build -d
+```
 
-## Troubleshooting
+### 4. Verify Installation
 
-### Docker not found
-- Install Docker Desktop from: https://docs.docker.com/desktop/install/windows/
-- Ensure Docker is running before executing commands
+Check that the container is running:
 
-### Cursor CLI not installed
-If the CLI installation fails during build, you can install it manually:
+```bash
+docker ps
+```
+
+View agent logs:
+
+```bash
+docker exec cursor-agent tail -n 20 /workspace/cursor-agent.log
+```
+
+## Usage
+
+### Entering the Container
+
 ```bash
 docker exec -it cursor-agent bash
-curl https://cursor.com/install -fsS | bash
 ```
 
-### Authentication issues
-- Verify your `CURSOR_API_KEY` in the `.env` file
-- Check the container logs: `docker compose logs cursor-agent`
+### Running the Agent Interactively
 
-## File Structure
+**Using helper script:**
+```bash
+# macOS/Linux
+./scripts/run-agent-interactive.sh
 
-```
-.
-├── docker-compose.yml      # Docker Compose configuration
-├── docker/                 # Docker-related files
-│   ├── Dockerfile          # Container image definition
-│   ├── docker-entrypoint.sh    # Container entrypoint script
-│   └── docker-entrypoint-interactive.sh
-├── scripts/                # Helper scripts
-│   ├── run-docker.ps1      # Windows helper script
-│   ├── run-docker.sh       # macOS/Linux helper script
-│   ├── run-agent-interactive.ps1
-│   ├── run-agent-interactive.sh
-│   ├── test-hello-world.ps1
-│   ├── clear-sandbox.ps1   # Clear sandbox workspace (Windows)
-│   └── clear-sandbox.sh    # Clear sandbox workspace (macOS/Linux)
-├── docs/                   # Documentation
-│   ├── INTERACTIVE.md
-│   └── TESTING.md
-├── .env                    # Environment variables (gitignored)
-├── sandbox/                # Shared directory with Cursor
-└── README.md               # This file
-```
-
-## Running Interactively
-
-By default, `cursor-agent` runs in the background. To run it interactively:
-
-**Quick method:**
-```powershell
+# Windows PowerShell
 .\scripts\run-agent-interactive.ps1
 ```
 
@@ -134,28 +104,249 @@ By default, `cursor-agent` runs in the background. To run it interactively:
 docker exec -it cursor-agent cursor-agent
 ```
 
-See [docs/INTERACTIVE.md](docs/INTERACTIVE.md) for more options and details.
+### Managing the Sandbox Directory
 
-## Managing the Sandbox
+The `sandbox/` directory is shared between your host machine and the container. Use it to share files with the Cursor agent.
 
-The `sandbox/` directory is shared with the Cursor agent container. You can clear it to start fresh:
+**Clear sandbox (preserves README.md and .gitkeep):**
 
-**Windows (PowerShell):**
-```powershell
-.\scripts\clear-sandbox.ps1
-# Or skip confirmation:
-.\scripts\clear-sandbox.ps1 -Force
-```
-
-**macOS/Linux:**
 ```bash
-chmod +x scripts/clear-sandbox.sh
+# macOS/Linux
 ./scripts/clear-sandbox.sh
-# Or skip confirmation:
-./scripts/clear-sandbox.sh --force
+
+# Windows PowerShell
+.\scripts\clear-sandbox.ps1
 ```
 
-**Note:** The `clear-sandbox` script preserves `README.md` and `.gitkeep` and only deletes other files and directories.
+## Project Structure
+
+```
+.
+├── docker/
+│   ├── Dockerfile                      # Container image definition
+│   ├── docker-entrypoint.sh           # Main entrypoint script
+│   └── docker-entrypoint-interactive.sh # Interactive mode entrypoint
+├── docker-compose.yml                  # Docker Compose configuration
+├── scripts/
+│   ├── run-docker.sh                   # Build & start script (macOS/Linux)
+│   ├── run-docker.ps1                  # Build & start script (Windows)
+│   ├── run-agent-interactive.sh        # Interactive agent script (macOS/Linux)
+│   ├── run-agent-interactive.ps1       # Interactive agent script (Windows)
+│   ├── clear-sandbox.sh                # Clear sandbox script (macOS/Linux)
+│   └── clear-sandbox.ps1               # Clear sandbox script (Windows)
+├── docs/
+│   ├── INTERACTIVE.md                  # Interactive mode documentation
+│   └── TESTING.md                      # Testing guide
+├── sandbox/                            # Shared workspace directory
+│   └── .gitkeep                        # Git placeholder
+├── .env.example                        # Environment variables template
+└── README.md                           # This file
+```
+
+## Configuration
+
+### Environment Variables
+
+The `.env` file supports the following variables:
+
+```bash
+# Required: Your Cursor API key for authentication
+CURSOR_API_KEY=your_cursor_api_key_here
+
+# Add any other environment variables your setup needs below
+```
+
+### Docker Compose Options
+
+Key configuration options in `docker-compose.yml`:
+
+- **INSTALL_CURSOR**: Set to `"false"` to skip CLI installation during build
+- **Volumes**:
+  - `./sandbox:/workspace:rw` - Mounts only the `sandbox/` directory to `/workspace`
+
+## Common Commands
+
+### Container Management
+
+```bash
+# Start container
+docker compose up -d
+
+# Stop container
+docker compose down
+
+# Rebuild container
+docker compose up --build -d
+
+# View logs
+docker compose logs -f cursor-agent
+
+# Check container status
+docker ps
+```
+
+### Agent Operations
+
+```bash
+# View agent logs
+docker exec cursor-agent tail -n 50 /workspace/cursor-agent.log
+
+# Follow logs in real-time
+docker exec cursor-agent tail -f /workspace/cursor-agent.log
+
+# Stop background agent
+docker exec cursor-agent pkill cursor-agent
+
+# Check if agent is running
+docker exec cursor-agent pgrep cursor-agent
+```
+
+### File Operations
+
+```bash
+# List files in workspace
+docker exec cursor-agent ls -la /workspace
+
+# List files in sandbox
+docker exec cursor-agent ls -la /workspace/sandbox
+
+# Copy file to container
+docker cp local-file.txt cursor-agent:/workspace/sandbox/
+
+# Copy file from container
+docker cp cursor-agent:/workspace/sandbox/file.txt ./
+```
+
+## Troubleshooting
+
+### Docker Not Found
+
+**Windows:**
+- Install Docker Desktop from [docker.com](https://docs.docker.com/desktop/install/windows/)
+- Ensure Docker Desktop is running before executing commands
+
+**macOS:**
+- Install Docker Desktop from [docker.com](https://docs.docker.com/desktop/install/mac-install/)
+- Start Docker Desktop from Applications
+
+**Linux:**
+- Install Docker Engine: `sudo apt-get install docker.io docker-compose`
+- Ensure Docker daemon is running: `sudo systemctl start docker`
+
+### Cursor CLI Installation Failed
+
+If the CLI installation fails during build, install manually:
+
+```bash
+docker exec -it cursor-agent bash
+curl https://cursor.com/install -fsS | bash
+export PATH="/root/.local/bin:$PATH"
+```
+
+### Authentication Issues
+
+1. Verify your API key is set:
+   ```bash
+   docker exec cursor-agent env | grep CURSOR
+   ```
+
+2. Check `.env` file exists and contains `CURSOR_API_KEY`
+
+3. Restart container after changing `.env`:
+   ```bash
+   docker compose down
+   docker compose up -d
+   ```
+
+### Container Won't Start
+
+1. Check Docker logs:
+   ```bash
+   docker compose logs cursor-agent
+   ```
+
+2. Verify Docker resources (CPU/Memory) in Docker Desktop settings
+
+3. Try rebuilding:
+   ```bash
+   docker compose down
+   docker compose up --build -d
+   ```
+
+### Files Not Visible in Container
+
+1. Verify volume mounts:
+   ```bash
+   docker exec cursor-agent ls -la /workspace
+   ```
+
+2. Check `docker-compose.yml` volumes section
+
+3. Restart container:
+   ```bash
+   docker compose restart
+   ```
+
+## Background vs Interactive Mode
+
+### Background Mode (Default)
+
+- Agent runs automatically on container startup
+- Logs written to `/workspace/cursor-agent.log`
+- Container stays alive for exec access
+- Best for: Production use, long-running sessions
+
+### Interactive Mode
+
+- Agent runs in foreground
+- Output shown directly in terminal
+- Easier to debug and see real-time output
+- Best for: Development, testing, debugging
+
+See [docs/INTERACTIVE.md](docs/INTERACTIVE.md) for detailed interactive mode documentation.
+
+## Development
+
+### Building the Image
+
+```bash
+docker compose build
+```
+
+### Skipping Cursor Installation
+
+To skip Cursor CLI installation during build (install manually later):
+
+1. Edit `docker-compose.yml`
+2. Set `INSTALL_CURSOR: "false"`
+3. Rebuild: `docker compose up --build -d`
+
+### Custom Entrypoint
+
+The entrypoint script (`docker/docker-entrypoint.sh`) handles:
+- Loading `.env` file
+- Configuring Cursor CLI with API key
+- Starting cursor-agent in background (if available)
+
+## Documentation
+
+- [Interactive Mode Guide](docs/INTERACTIVE.md) - Detailed guide for running the agent interactively
+- [Testing Guide](docs/TESTING.md) - Testing and verification procedures
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[Add your license here]
+
+## Support
+
+For issues and questions:
+- Check the [Troubleshooting](#troubleshooting) section
+- Review the documentation in `docs/`
+- Open an issue on GitHub
 
 ## Notes
 

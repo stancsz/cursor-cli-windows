@@ -6,7 +6,8 @@
 # 3) Cursor CLI is installed during build and the entrypoint auto-starts the agent.
 #
 # Notes:
-# - The repo root is mounted at /workspace so the Cursor agent can access files.
+# - Only the sandbox directory is mounted at /workspace so the Cursor agent can
+#   access a restricted view of your files.
 # - The image is built from the Dockerfile in this repo; the Dockerfile runs the
 #   Cursor installer during build by default. Set INSTALL_CURSOR=false if you need
 #   to skip that step and install manually inside the container later.
@@ -24,8 +25,9 @@ services:
     env_file:
       - .env
     volumes:
-      - ./:/workspace:rw
-      - ./sandbox:/workspace/sandbox:rw
+      # Only expose the sandbox directory to the agent inside the container.
+      # Inside the container, /workspace is what the agent sees as its root.
+      - ./sandbox:/workspace:rw
     tty: true
     stdin_open: true
     # If the image was built with the Cursor installer, the agent will already be present.
