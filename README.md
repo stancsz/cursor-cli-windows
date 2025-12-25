@@ -2,6 +2,19 @@
 
 A containerized development environment for running the Cursor CLI agent on **Windows** using Docker. This project provides a complete setup for running Cursor's AI-powered coding assistant in an isolated, reproducible container environment, specifically designed for Windows users.
 
+> ## Quick Setup AI Prompt
+> To install `cursor-win` on your Windows computer, copy this prompt for your AI agent:
+> ```
+> Install cursor-win on my Windows computer by:
+> 1. Cloning the repository from https://github.com/stancsz/cursor-cli-windows.git
+> 2. Getting my CURSOR_API_KEY from https://cursor.com/dashboard?tab=cloud-agents
+> 3. Creating a .env file from .env.example and adding my CURSOR_API_KEY
+> 4. Running the setup script (.\scripts\setup-cursor-command.ps1) to add cursor-win to PATH
+> 5. Building and starting the Docker container using .\scripts\run-docker.ps1
+> 6. Verifying the installation works by running cursor-win from any directory
+> ```
+
+
 ## Why This Project?
 
 Running the Cursor CLI on Windows can be challenging due to several factors:
@@ -45,7 +58,7 @@ This repository provides a Docker-based solution for running the Cursor CLI agen
 - **Windows 10/11** (this project is designed for Windows)
 - **Docker Desktop for Windows** - Install from [docker.com](https://docs.docker.com/desktop/install/windows/)
 - **PowerShell** (included with Windows)
-- **Cursor API Key** (for authentication)
+- **Cursor API Key** (for authentication) - Get yours from [cursor.com/dashboard?tab=cloud-agents](https://cursor.com/dashboard?tab=cloud-agents)
 
 ## Quick Start
 
@@ -64,7 +77,7 @@ Create a `.env` file from the example:
 Copy-Item .env.example .env
 ```
 
-Or manually create `.env` and add your Cursor API key:
+Or manually create `.env` and add your Cursor API key (get it from [cursor.com/dashboard?tab=cloud-agents](https://cursor.com/dashboard?tab=cloud-agents)):
 
 ```powershell
 CURSOR_API_KEY=your_cursor_api_key_here
