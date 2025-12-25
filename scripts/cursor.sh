@@ -18,9 +18,13 @@ RUN_SCRIPT="$SCRIPT_DIR/run-agent-interactive.sh"
 # Resolve the workspace path
 if [ "$WORKSPACE_PATH" = "." ] || [ -z "$WORKSPACE_PATH" ]; then
     WORKSPACE_PATH="$(pwd)"
-elif [ ! -d "$WORKSPACE_PATH" ]; then
-    # Relative path - resolve relative to current directory
+elif [ -d "$WORKSPACE_PATH" ]; then
+    # Path exists - resolve it to absolute path (handles both absolute and relative)
     WORKSPACE_PATH="$(cd "$WORKSPACE_PATH" && pwd)"
+else
+    # Path doesn't exist - provide clear error message
+    echo "Error: Path does not exist: $WORKSPACE_PATH" >&2
+    exit 1
 fi
 
 # Call the actual script

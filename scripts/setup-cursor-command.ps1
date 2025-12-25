@@ -30,12 +30,21 @@ if ($SystemPath) {
 # Get current PATH
 $CurrentPath = [Environment]::GetEnvironmentVariable("Path", $PathScope)
 
+# Handle null or empty PATH
+if ([string]::IsNullOrEmpty($CurrentPath)) {
+    $CurrentPath = ""
+}
+
 # Check if already in PATH
 if ($CurrentPath -split ';' | Where-Object { $_ -eq $ScriptDir }) {
     Write-Host "✓ Scripts directory is already in $PathName" -ForegroundColor Green
 } else {
-    # Add to PATH
-    $NewPath = $CurrentPath + ";" + $ScriptDir
+    # Add to PATH - only add semicolon if CurrentPath is not empty
+    if ([string]::IsNullOrEmpty($CurrentPath)) {
+        $NewPath = $ScriptDir
+    } else {
+        $NewPath = $CurrentPath + ";" + $ScriptDir
+    }
     [Environment]::SetEnvironmentVariable("Path", $NewPath, $PathScope)
     Write-Host "✓ Added scripts directory to $PathName" -ForegroundColor Green
     Write-Host "  Location: $ScriptDir" -ForegroundColor Gray

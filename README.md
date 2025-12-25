@@ -52,8 +52,8 @@ This repository provides a Docker-based solution for running the Cursor CLI agen
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/stancsz/cursor-sandbox.git
-cd cursor-sandbox
+git clone https://github.com/stancsz/cursor-cli-windows.git
+cd cursor-cli-windows
 ```
 
 ### 2. Configure Environment
