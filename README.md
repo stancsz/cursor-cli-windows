@@ -1,28 +1,50 @@
-# Cursor CLI Docker Setup
+# Cursor CLI Docker Setup for Windows
 
-A containerized development environment for running the Cursor CLI agent with Docker. This project provides a complete setup for running Cursor's AI-powered coding assistant in an isolated, reproducible container environment.
+A containerized development environment for running the Cursor CLI agent on **Windows** using Docker. This project provides a complete setup for running Cursor's AI-powered coding assistant in an isolated, reproducible container environment, specifically designed for Windows users.
+
+## Why This Project?
+
+Running the Cursor CLI on Windows can be challenging due to several factors:
+
+- **Installation Complexity**: The Cursor CLI installer is primarily designed for Unix-like systems (Linux/macOS), making native Windows installation difficult or unreliable
+- **Dependency Issues**: Windows lacks many of the native dependencies that Cursor CLI expects, requiring complex workarounds or WSL (Windows Subsystem for Linux)
+- **Path and Environment Problems**: Windows path handling, line endings (CRLF vs LF), and environment variable management differ significantly from Unix systems, causing configuration headaches
+- **WSL Overhead**: While WSL can work, it adds complexity, requires additional setup, and may have performance overhead or compatibility issues
+- **No Native Windows Support**: Cursor CLI doesn't have official Windows binaries, forcing users to rely on workarounds
+
+**This project solves these problems** by:
+- ✅ Running Cursor CLI in a Docker container (Linux environment) on Windows
+- ✅ Providing simple PowerShell scripts that handle all the complexity
+- ✅ Automatically managing Docker, environment variables, and configuration
+- ✅ Offering a single `cursor-win` command that works from anywhere
+- ✅ Eliminating the need for WSL or manual Linux-like environment setup
+- ✅ Handling Windows-specific issues (path conversion, line endings, etc.) automatically
 
 ## Overview
 
-This repository provides a Docker-based solution for running the Cursor CLI agent, making it easy to:
-- Run Cursor agent in a consistent, isolated environment
-- Share workspace files between host and container
+This repository provides a Docker-based solution for running the Cursor CLI agent on Windows, making it easy to:
+- Run Cursor agent in a consistent, isolated environment on Windows
+- Share workspace files between Windows host and container
 - Manage agent configuration and authentication
 - Run the agent in background or interactive modes
+- Use a simple `cursor-win` command from anywhere on your system
 
 ## Features
 
+- 🪟 **Windows-First**: Designed specifically for Windows with PowerShell scripts and native Windows support
 - 🐳 **Docker-based**: Fully containerized setup using Docker Compose
 - 🔐 **Secure Configuration**: Environment-based API key management
 - 📁 **Volume Mounting**: Full workspace access with shared sandbox directory
-- 🚀 **Quick Start**: Helper scripts for Windows, macOS, and Linux
+- 🚀 **Quick Start**: Simple PowerShell scripts for easy setup and usage
 - 📊 **Logging**: Automatic log file generation for background operations
 - 🔄 **Interactive Mode**: Support for both background and interactive agent execution
+- ⌨️ **Command Line Tool**: `cursor-win` command available system-wide after setup
 
 ## Prerequisites
 
-- **Docker Desktop** (Windows/macOS) or **Docker Engine** (Linux)
-- **Docker Compose** (included with Docker Desktop, or install separately)
+- **Windows 10/11** (this project is designed for Windows)
+- **Docker Desktop for Windows** - Install from [docker.com](https://docs.docker.com/desktop/install/windows/)
+- **PowerShell** (included with Windows)
 - **Cursor API Key** (for authentication)
 
 ## Quick Start
@@ -38,31 +60,25 @@ cd cursor-sandbox
 
 Create a `.env` file from the example:
 
-```bash
-cp .env.example .env
+```powershell
+Copy-Item .env.example .env
 ```
 
-Edit `.env` and add your Cursor API key:
+Or manually create `.env` and add your Cursor API key:
 
-```bash
+```powershell
 CURSOR_API_KEY=your_cursor_api_key_here
 ```
 
 ### 3. Build and Start
 
-**Windows (PowerShell):**
+**Using the helper script (recommended):**
 ```powershell
 .\scripts\run-docker.ps1
 ```
 
-**macOS/Linux:**
-```bash
-chmod +x scripts/run-docker.sh
-./scripts/run-docker.sh
-```
-
 **Or manually:**
-```bash
+```powershell
 docker compose up --build -d
 ```
 
@@ -90,17 +106,18 @@ docker exec -it cursor-agent bash
 
 ### Running the Agent Interactively
 
-**Using helper script:**
-```bash
-# macOS/Linux
-./scripts/run-agent-interactive.sh
-
-# Windows PowerShell
+**Using the helper script (recommended):**
+```powershell
 .\scripts\run-agent-interactive.ps1
 ```
 
+**Or with a custom workspace path:**
+```powershell
+.\scripts\run-agent-interactive.ps1 C:\path\to\your\project
+```
+
 **Manual method:**
-```bash
+```powershell
 docker exec -it cursor-agent cursor-agent
 ```
 
@@ -126,29 +143,18 @@ cursor-win .
 cursor-win C:\path\to\your\project
 ```
 
-**How it works on Windows:**
-- `cursor-win.cmd` → calls `cursor-win.ps1` → calls `run-agent-interactive.ps1` (Windows PowerShell version)
+**How it works:**
+- `cursor-win.cmd` → calls `cursor-win.ps1` → calls `run-agent-interactive.ps1` (Windows PowerShell)
 - Uses Docker to run the cursor-agent in a container
-- All Windows-compatible, no `.sh` scripts involved
+- All Windows-compatible PowerShell scripts
+- Automatically checks if Docker is running before proceeding
 
-**Linux/macOS Setup:**
-```bash
-# Make scripts executable
-chmod +x scripts/cursor.sh scripts/run-agent-interactive.sh
-
-# Add to PATH (add to ~/.bashrc or ~/.zshrc)
-export PATH="$PATH:/path/to/cursor-sandbox/scripts"
-
-# Or create a symlink
-ln -s /path/to/cursor-sandbox/scripts/cursor.sh /usr/local/bin/cursor
-```
-
-**Manual PATH Setup (Windows):**
+**Manual PATH Setup:**
 1. Add the `scripts/` directory to your system PATH
 2. Restart your terminal
 3. Use `cursor-win` command from anywhere
 
-The `cursor-win` command (Windows) and `cursor.sh` (Linux/macOS) are wrappers that call the appropriate `run-agent-interactive` script (`.ps1` on Windows, `.sh` on Linux/macOS) with the specified workspace path.
+**Note:** Bash scripts (`.sh`) are included for reference but this project is optimized for Windows. The primary workflow uses PowerShell scripts.
 
 ### Managing the Sandbox Directory
 
@@ -156,11 +162,7 @@ The `sandbox/` directory is shared between your host machine and the container. 
 
 **Clear sandbox (preserves README.md and .gitkeep):**
 
-```bash
-# macOS/Linux
-./scripts/clear-sandbox.sh
-
-# Windows PowerShell
+```powershell
 .\scripts\clear-sandbox.ps1
 ```
 
@@ -174,16 +176,16 @@ The `sandbox/` directory is shared between your host machine and the container. 
 │   └── docker-entrypoint-interactive.sh # Interactive mode entrypoint
 ├── docker-compose.yml                  # Docker Compose configuration
 ├── scripts/
-│   ├── run-docker.sh                   # Build & start script (macOS/Linux)
-│   ├── run-docker.ps1                  # Build & start script (Windows)
-│   ├── run-agent-interactive.sh        # Interactive agent script (macOS/Linux)
-│   ├── run-agent-interactive.ps1       # Interactive agent script (Windows)
-│   ├── clear-sandbox.sh                # Clear sandbox script (macOS/Linux)
-│   ├── clear-sandbox.ps1               # Clear sandbox script (Windows)
-│   ├── cursor.sh                       # Cursor command wrapper (Linux/macOS)
-│   ├── cursor-win.ps1                  # Cursor command wrapper (PowerShell, Windows)
+│   ├── run-docker.ps1                  # Build & start script (Windows - primary)
+│   ├── run-agent-interactive.ps1       # Interactive agent script (Windows - primary)
+│   ├── clear-sandbox.ps1               # Clear sandbox script (Windows - primary)
+│   ├── cursor-win.ps1                  # Cursor command wrapper (PowerShell)
 │   ├── cursor-win.cmd                   # Cursor command wrapper (CMD, calls cursor-win.ps1)
-│   └── setup-cursor-command.ps1        # Setup script to add cursor-win to PATH (Windows)
+│   ├── setup-cursor-command.ps1        # Setup script to add cursor-win to PATH
+│   ├── run-docker.sh                   # Build & start script (bash - reference)
+│   ├── run-agent-interactive.sh        # Interactive agent script (bash - reference)
+│   ├── clear-sandbox.sh                # Clear sandbox script (bash - reference)
+│   └── cursor.sh                       # Cursor command wrapper (bash - reference)
 ├── docs/
 │   ├── INTERACTIVE.md                  # Interactive mode documentation
 │   └── TESTING.md                      # Testing guide
@@ -274,20 +276,13 @@ docker cp cursor-agent:/workspace/sandbox/file.txt ./
 **Windows:**
 - Install Docker Desktop from [docker.com](https://docs.docker.com/desktop/install/windows/)
 - Ensure Docker Desktop is running before executing commands
-
-**macOS:**
-- Install Docker Desktop from [docker.com](https://docs.docker.com/desktop/install/mac-install/)
-- Start Docker Desktop from Applications
-
-**Linux:**
-- Install Docker Engine: `sudo apt-get install docker.io docker-compose`
-- Ensure Docker daemon is running: `sudo systemctl start docker`
+- The scripts will automatically check if Docker is running and prompt you to start it if needed
 
 ### Cursor CLI Installation Failed
 
 If the CLI installation fails during build, install manually:
 
-```bash
+```powershell
 docker exec -it cursor-agent bash
 curl https://cursor.com/install -fsS | bash
 export PATH="/root/.local/bin:$PATH"
@@ -296,14 +291,14 @@ export PATH="/root/.local/bin:$PATH"
 ### Authentication Issues
 
 1. Verify your API key is set:
-   ```bash
+   ```powershell
    docker exec cursor-agent env | grep CURSOR
    ```
 
 2. Check `.env` file exists and contains `CURSOR_API_KEY`
 
 3. Restart container after changing `.env`:
-   ```bash
+   ```powershell
    docker compose down
    docker compose up -d
    ```
@@ -311,14 +306,16 @@ export PATH="/root/.local/bin:$PATH"
 ### Container Won't Start
 
 1. Check Docker logs:
-   ```bash
+   ```powershell
    docker compose logs cursor-agent
    ```
 
 2. Verify Docker resources (CPU/Memory) in Docker Desktop settings
 
-3. Try rebuilding:
-   ```bash
+3. Ensure Docker Desktop is running (scripts will check this automatically)
+
+4. Try rebuilding:
+   ```powershell
    docker compose down
    docker compose up --build -d
    ```
@@ -326,14 +323,14 @@ export PATH="/root/.local/bin:$PATH"
 ### Files Not Visible in Container
 
 1. Verify volume mounts:
-   ```bash
+   ```powershell
    docker exec cursor-agent ls -la /workspace
    ```
 
 2. Check `docker-compose.yml` volumes section
 
 3. Restart container:
-   ```bash
+   ```powershell
    docker compose restart
    ```
 
@@ -359,7 +356,7 @@ See [docs/INTERACTIVE.md](docs/INTERACTIVE.md) for detailed interactive mode doc
 
 ### Building the Image
 
-```bash
+```powershell
 docker compose build
 ```
 
@@ -400,8 +397,11 @@ For issues and questions:
 
 ## Notes
 
+- **Windows-focused**: This project is designed and optimized for Windows users
 - The container runs `cursor-agent` automatically in the background on startup if the CLI is installed
 - Logs are written to `/workspace/cursor-agent.log` inside the container
 - The container stays alive with `tail -f /dev/null` so you can exec into it
 - Set `INSTALL_CURSOR=false` in docker-compose.yml to skip CLI installation during build
 - Use interactive mode for debugging or when you need to see real-time output
+- All scripts automatically check if Docker is running before proceeding
+- Bash scripts (`.sh`) are included for reference but PowerShell scripts (`.ps1`) are the primary interface
