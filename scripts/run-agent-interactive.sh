@@ -43,10 +43,13 @@ if [ -n "$WORKSPACE_PATH" ]; then
         IMAGE_NAME=$(docker compose config --images | grep cursor-agent | tr -d ' ')
     fi
     
-    # Get .env file path
+    # Get .env file path from repo root
     ENV_FILE="$REPO_ROOT/.env"
     ENV_FILE_ARGS=()
+    ENV_VOLUME_ARGS=()
     if [ -f "$ENV_FILE" ]; then
+        # Mount repo's .env file to a fixed location in container
+        ENV_VOLUME_ARGS=("-v" "${ENV_FILE}:/repo/.env:ro")
         ENV_FILE_ARGS=("--env-file" "$ENV_FILE")
     fi
     
@@ -59,6 +62,7 @@ if [ -n "$WORKSPACE_PATH" ]; then
         --name cursor-agent \
         --workdir /workspace \
         "${ENV_FILE_ARGS[@]}" \
+        "${ENV_VOLUME_ARGS[@]}" \
         -v "${WORKSPACE_PATH}:/workspace:rw" \
         --entrypoint /usr/local/bin/docker-entrypoint-interactive.sh \
         "$IMAGE_NAME" \

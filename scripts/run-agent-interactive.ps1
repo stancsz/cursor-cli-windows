@@ -50,10 +50,13 @@ if ($WorkspacePath) {
     }
     Pop-Location
     
-    # Get .env file path
+    # Get .env file path from repo root
     $envFile = Join-Path $RepoRoot ".env"
     $envFileArgs = @()
+    $envVolumeArgs = @()
     if (Test-Path $envFile) {
+        # Mount repo's .env file to a fixed location in container
+        $envVolumeArgs = @("-v", "${envFile}:/repo/.env:ro")
         $envFileArgs = @("--env-file", $envFile)
     }
     
@@ -69,6 +72,7 @@ if ($WorkspacePath) {
         "--workdir", "/workspace"
     )
     $dockerArgs += $envFileArgs
+    $dockerArgs += $envVolumeArgs
     $dockerArgs += @(
         "-v", "${WorkspacePath}:/workspace:rw",
         "--entrypoint", "/usr/local/bin/docker-entrypoint-interactive.sh",

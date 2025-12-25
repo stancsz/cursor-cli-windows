@@ -10,16 +10,26 @@ export PATH="/root/.local/bin:$PATH"
 # To use this, override the entrypoint in docker-compose.yml or use:
 # docker compose run --entrypoint /usr/local/bin/docker-entrypoint-interactive.sh cursor-agent
 
-# Load .env from the mounted repository if it exists
-if [ -f /workspace/.env ]; then
-  echo "Sourcing /workspace/.env"
+# Load .env from the repo root (mounted at /repo/.env) if it exists
+# This ensures we use the repo's .env file, not the workspace's .env
+if [ -f /repo/.env ]; then
+  echo "Sourcing /repo/.env (repo configuration)"
+  # Strip CR characters (handle Windows CRLF line endings) and source
   # Export all variables defined in .env
   set -o allexport
   # shellcheck disable=SC1090
-  . /workspace/.env
+  # Use process substitution to strip CR characters before sourcing
+  . <(tr -d '\r' < /repo/.env)
+  set +o allexport
+elif [ -f /workspace/.env ]; then
+  # Fallback: if repo .env not found, try workspace .env (for docker-compose mode)
+  echo "Sourcing /workspace/.env (workspace configuration)"
+  set -o allexport
+  # shellcheck disable=SC1090
+  . <(tr -d '\r' < /workspace/.env)
   set +o allexport
 else
-  echo "/workspace/.env not found; skipping env load"
+  echo ".env not found; skipping env load (using --env-file if provided)"
 fi
 
 # Provide some diagnostic info
