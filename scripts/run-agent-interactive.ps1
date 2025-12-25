@@ -13,6 +13,46 @@ param(
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
 
+# Function to check if Docker is running
+function Test-DockerRunning {
+    $dockerCheck = docker ps 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        return $false
+    }
+    return $true
+}
+
+# Check if Docker is running
+Write-Host "Checking Docker status..." -ForegroundColor Cyan
+if (-not (Test-DockerRunning)) {
+    Write-Host ""
+    Write-Host "Error: Docker is not running!" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Please start Docker Desktop and wait for it to fully start," -ForegroundColor Yellow
+    Write-Host "then run this command again." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "To start Docker Desktop:" -ForegroundColor Cyan
+    Write-Host "  1. Open Docker Desktop from the Start menu" -ForegroundColor White
+    Write-Host "  2. Wait for Docker to start (you'll see 'Docker Desktop is running' in the system tray)" -ForegroundColor White
+    Write-Host "  3. Then run: cursor-win" -ForegroundColor White
+    Write-Host ""
+    
+    # Optionally try to start Docker Desktop automatically
+    $dockerDesktopPath = "${env:ProgramFiles}\Docker\Docker\Docker Desktop.exe"
+    if (Test-Path $dockerDesktopPath) {
+        $response = Read-Host "Would you like to start Docker Desktop now? (Y/N)"
+        if ($response -eq 'Y' -or $response -eq 'y') {
+            Write-Host "Starting Docker Desktop..." -ForegroundColor Green
+            Start-Process $dockerDesktopPath
+            Write-Host ""
+            Write-Host "Please wait for Docker Desktop to start, then run cursor-win again." -ForegroundColor Yellow
+        }
+    }
+    exit 1
+}
+
+Write-Host "Docker is running" -ForegroundColor Green
+Write-Host ""
 Write-Host "Starting cursor-agent in interactive mode..." -ForegroundColor Cyan
 Write-Host ""
 

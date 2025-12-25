@@ -13,6 +13,20 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 WORKSPACE_PATH="${1:-}"
 
+# Check if Docker is running
+echo "Checking Docker status..."
+if ! docker ps >/dev/null 2>&1; then
+    echo ""
+    echo "Error: Docker is not running!" >&2
+    echo ""
+    echo "Please start Docker Desktop (or Docker daemon) and wait for it to fully start," >&2
+    echo "then run this command again." >&2
+    echo ""
+    exit 1
+fi
+
+echo "Docker is running"
+echo ""
 echo "Starting cursor-agent in interactive mode..."
 echo ""
 

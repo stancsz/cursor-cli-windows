@@ -104,6 +104,52 @@ docker exec -it cursor-agent bash
 docker exec -it cursor-agent cursor-agent
 ```
 
+### Using the `cursor-win` Command (Quick Access - Windows)
+
+For convenience, you can add the `cursor-win` command to your PATH to run the agent from anywhere on Windows.
+
+**Windows Setup:**
+```powershell
+# Run the setup script (adds scripts directory to PATH)
+.\scripts\setup-cursor-command.ps1
+```
+
+After setup, you can use `cursor-win` from any directory:
+```powershell
+# Run in current directory
+cursor-win
+
+# Or explicitly
+cursor-win .
+
+# Run in a specific directory
+cursor-win C:\path\to\your\project
+```
+
+**How it works on Windows:**
+- `cursor-win.cmd` → calls `cursor-win.ps1` → calls `run-agent-interactive.ps1` (Windows PowerShell version)
+- Uses Docker to run the cursor-agent in a container
+- All Windows-compatible, no `.sh` scripts involved
+
+**Linux/macOS Setup:**
+```bash
+# Make scripts executable
+chmod +x scripts/cursor.sh scripts/run-agent-interactive.sh
+
+# Add to PATH (add to ~/.bashrc or ~/.zshrc)
+export PATH="$PATH:/path/to/cursor-sandbox/scripts"
+
+# Or create a symlink
+ln -s /path/to/cursor-sandbox/scripts/cursor.sh /usr/local/bin/cursor
+```
+
+**Manual PATH Setup (Windows):**
+1. Add the `scripts/` directory to your system PATH
+2. Restart your terminal
+3. Use `cursor-win` command from anywhere
+
+The `cursor-win` command (Windows) and `cursor.sh` (Linux/macOS) are wrappers that call the appropriate `run-agent-interactive` script (`.ps1` on Windows, `.sh` on Linux/macOS) with the specified workspace path.
+
 ### Managing the Sandbox Directory
 
 The `sandbox/` directory is shared between your host machine and the container. Use it to share files with the Cursor agent.
@@ -133,7 +179,11 @@ The `sandbox/` directory is shared between your host machine and the container. 
 │   ├── run-agent-interactive.sh        # Interactive agent script (macOS/Linux)
 │   ├── run-agent-interactive.ps1       # Interactive agent script (Windows)
 │   ├── clear-sandbox.sh                # Clear sandbox script (macOS/Linux)
-│   └── clear-sandbox.ps1               # Clear sandbox script (Windows)
+│   ├── clear-sandbox.ps1               # Clear sandbox script (Windows)
+│   ├── cursor.sh                       # Cursor command wrapper (Linux/macOS)
+│   ├── cursor-win.ps1                  # Cursor command wrapper (PowerShell, Windows)
+│   ├── cursor-win.cmd                   # Cursor command wrapper (CMD, calls cursor-win.ps1)
+│   └── setup-cursor-command.ps1        # Setup script to add cursor-win to PATH (Windows)
 ├── docs/
 │   ├── INTERACTIVE.md                  # Interactive mode documentation
 │   └── TESTING.md                      # Testing guide
